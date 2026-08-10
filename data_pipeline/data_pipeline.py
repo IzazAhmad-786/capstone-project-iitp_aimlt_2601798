@@ -233,18 +233,22 @@ def run_queries(conn):
 def main():
     # Scrape the data       
     all_books_data = scrape_data()
+    print("=="*50)
 
     #cleaning the data
     cleaned_data = clean_data(all_books_data)
+    print("=="*50)
 
     # Establish a connection to the SQLite database
     conn = get_connection()
 
     # Load the cleaned data into the database
     load_data(conn, cleaned_data)
+    print("=="*50)
 
     # Run the queries on the database
     run_queries(conn)
+    print("=="*50)
 
     # Close the database connection
     conn.close()
