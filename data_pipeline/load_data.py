@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS categories;
 
 CREATE TABLE categories (
     category_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    category_name TEXT NOT NULL
+    category_name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE books (
@@ -23,6 +23,13 @@ CREATE TABLE books (
     category_id INTEGER NOT NULL,
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
+
+CREATE INDEX idx_categories_category_name ON categories(category_name);
+
+CREATE INDEX idx_books_category_id ON books(category_id);
+CREATE INDEX idx_books_price_inr ON books(price_inr);
+CREATE INDEX idx_books_rating ON books(rating);
+CREATE INDEX idx_books_in_stock ON books(in_stock);
 """
 
 def load_data():

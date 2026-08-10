@@ -1,6 +1,5 @@
 import os
 import csv
-import time
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -11,7 +10,7 @@ OUTPUT_FILE_NAME = OUTPUT_DIR+"raw_books.csv"
 NUM_CATEGORIES = 5
     
 def get_categories():
-    resp = requests.get(BASE_URL+ "index.html")
+    resp = requests.get(urljoin(BASE_URL, "index.html") )
     resp.raise_for_status()
     resp.encoding = resp.apparent_encoding
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -19,7 +18,7 @@ def get_categories():
     categories = []
     for link in soup.select("div.side_categories ul li ul li a"):
         name = link.get_text(strip=True)
-        url = BASE_URL+link["href"]
+        url = urljoin(BASE_URL, link["href"])
         categories.append((name, url))
     return categories
 
@@ -51,8 +50,6 @@ def scrape_category(name, url):
         # since next_link["href"] (e.g. "page-2.html") is relative to url's
         # directory, not a suffix to append to it.
         url = urljoin(url, next_link["href"]) if next_link else None
-        if url:
-            time.sleep(0.2)  # be polite to the server between page requests
 
     return books
 
