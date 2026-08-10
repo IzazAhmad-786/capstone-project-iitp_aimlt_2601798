@@ -1,0 +1,210 @@
+Scraping book data from the website.
+Travel: 11 books.
+Mystery: 32 books.
+Historical Fiction: 26 books.
+Sequential Art: 75 books.
+Classics: 19 books.
+Total: 163 books across 5 categories.
+====================================================================================================
+Cleaning data: 163 rows, 0 missing values.
+Cleaned data: 163 rows, 0 missing values.
+====================================================================================================
+Connection established successfully!.
+Loading data into database.
+Inserted 5 categories into the database.
+Inserted 163 books into the database.
+====================================================================================================
+Running queries on the database.
+---Q1: In-stock books over 300 INR---
+SELECT title, price_inr FROM books WHERE in_stock = 1 AND price_inr > 300;
+                                                 title  price_inr
+0                              It's Only the Himalayas    4765.44
+1    Full Moon over Noah’s Ark: An Odyssey to Mount...    5214.86
+2    See America: A Celebration of Our National Par...    5155.78
+3    Vagabonding: An Uncommon Guide to the Art of L...    3897.17
+4                                 Under the Tuscan Sun    3938.31
+..                                                 ...        ...
+158                                  The Little Prince    4791.81
+159                              Sense and Sensibility    3952.03
+160                                    Of Mice and Men    4970.10
+161                                               Emma    3474.12
+162  Alice in Wonderland (Alice's Adventures in Won...    5858.42
+
+[163 rows x 2 columns]
+------------------------------------------------------------------------------------------
+---Q2: 10 most expensive books (INR)---
+SELECT title, price_inr FROM books ORDER BY price_inr DESC LIMIT 10;
+                                               title  price_inr
+0                      Boar Island (Anna Pigeon #19)    6275.14
+1                                            Candide    6185.46
+2  The No. 1 Ladies' Detective Agency (No. 1 Ladi...    6087.35
+3                                           El Deafo    6078.91
+4                                        Animal Farm    6036.71
+5   Ajin: Demi-Human, Volume 1 (Ajin: Demi-Human #1)    6019.83
+6                   A Year in Provence (Provence #1)    6000.84
+7               Giant Days, Vol. 1 (Giant Days #1-4)    5988.18
+8                                The Past Never Ends    5960.75
+9  The Sandman, Vol. 3: Dream Country (The Sandma...    5860.52
+------------------------------------------------------------------------------------------
+---Q3: Distinct category names present---
+SELECT DISTINCT category_name FROM categories ORDER BY category_name;
+        category_name
+0            Classics
+1  Historical Fiction
+2             Mystery
+3      Sequential Art
+4              Travel
+------------------------------------------------------------------------------------------
+---Q4: Books rated 4 or 5 stars priced between 500 and 2000 INR---
+SELECT title, rating, price_inr FROM books WHERE rating IN (4, 5) AND price_inr BETWEEN 500 AND 2000;
+                                                title  rating  price_inr
+0   Outcast, Vol. 1: A Darkness Surrounds Him (Out...       4    1628.92
+1                                       Camp Midnight       4    1801.94
+2   Y: The Last Man, Vol. 1: Unmanned (Y: The Last...       4    1952.80
+3                                   The Secret Garden       4    1590.94
+4                                   The Girl You Lost       5    1296.59
+5   A Spy's Devotion (The Regency Spies of London #1)       5    1790.33
+6   Princess Jellyfish 2-in-1 Omnibus, Vol. 01 (Pr...       5    1435.86
+7            Batman: The Dark Knight Returns (Batman)       5    1622.59
+8   Superman Vol. 1: Before Truth (Superman by Gen...       5    1254.40
+9                                         Roller Girl       5    1487.55
+10           Fruits Basket, Vol. 2 (Fruits Basket #2)       5    1228.02
+------------------------------------------------------------------------------------------
+---Q5: All books joined with category name---
+SELECT category_name, title, rating, price_inr FROM (
+                        SELECT c.category_name, b.title, b.rating, b.price_inr,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY c.category_id ORDER BY b.rating DESC, b.price_inr DESC
+                        ) AS rnk
+                        FROM books b JOIN categories c ON b.category_id = c.category_id
+                    )
+                    WHERE rnk <= 10 ORDER BY category_name, rnk
+         category_name                                              title  rating  price_inr
+0             Classics                          The Story of Hong Gildong       4    4556.54
+1             Classics                     Little Women (Little Women #1)       4    2961.38
+2             Classics  The Complete Stories and Poems (The Works of E...       4    2825.29
+3             Classics                                  The Secret Garden       4    1590.94
+4             Classics                                            Candide       3    6185.46
+5             Classics                                        Animal Farm       3    6036.71
+6             Classics                                 Gone with the Wind       3    3427.70
+7             Classics                                  Wuthering Heights       3    1870.52
+8             Classics                             The Pilgrim's Progress       2    5302.43
+9             Classics                                    Of Mice and Men       2    4970.10
+10  Historical Fiction            A Flight of Arrows (The Pathfinders #2)       5    5858.42
+11  Historical Fiction                                While You Were Mine       5    4359.26
+12  Historical Fiction                                       The Red Tent       5    3762.13
+13  Historical Fiction                                       Mrs. Houdini       5    3191.38
+14  Historical Fiction                              The Passion of Dolssa       5    2987.76
+15  Historical Fiction                             Voyager (Outlander #3)       5    2222.89
+16  Historical Fiction                             Between Shades of Gray       5    2193.34
+17  Historical Fiction  A Spy's Devotion (The Regency Spies of London #1)       5    1790.33
+18  Historical Fiction                                  A Paris Apartment       4    4115.55
+19  Historical Fiction    World Without End (The Pillars of the Earth #2)       4    3478.34
+20             Mystery  The Bachelor Girl's Guide to Murder (Herringfo...       5    5517.65
+21             Mystery             A Time of Torment (Charlie Parker #14)       5    5100.92
+22             Mystery  What Happened on Beale Street (Secrets of the ...       5    2676.54
+23             Mystery                  The Silkworm (Cormoran Strike #2)       5    2431.78
+24             Mystery                                  The Girl You Lost       5    1296.59
+25             Mystery  The No. 1 Ladies' Detective Agency (No. 1 Ladi...       4    6087.35
+26             Mystery                                The Past Never Ends       4    5960.75
+27             Mystery  Murder at the 42nd Street Library (Raymond Amb...       4    5734.98
+28             Mystery                                      Sharp Objects       4    5045.01
+29             Mystery    The Murder of Roger Ackroyd (Hercule Poirot #4)       4    4652.55
+30      Sequential Art                                           El Deafo       5    6078.91
+31      Sequential Art  The Sandman, Vol. 3: Dream Country (The Sandma...       5    5860.52
+32      Sequential Art  Scott Pilgrim's Precious Little Life (Scott Pi...       5    5516.60
+33      Sequential Art  Rat Queens, Vol. 1: Sass & Sorcery (Rat Queens...       5    4954.28
+34      Sequential Art           Fruits Basket, Vol. 1 (Fruits Basket #1)       5    4249.54
+35      Sequential Art  Bleach, Vol. 1: Strawberry and the Soul Reaper...       5    3655.58
+36      Sequential Art      Saga, Volume 3 (Saga (Collected Editions) #3)       5    2275.64
+37      Sequential Art           Batman: The Dark Knight Returns (Batman)       5    1622.59
+38      Sequential Art                                        Roller Girl       5    1487.55
+39      Sequential Art  Princess Jellyfish 2-in-1 Omnibus, Vol. 01 (Pr...       5    1435.86
+40              Travel                 1,000 Places to See Before You Die       5    2751.44
+41              Travel                   A Year in Provence (Provence #1)       4    6000.84
+42              Travel  Full Moon over Noah’s Ark: An Odyssey to Mount...       4    5214.86
+43              Travel  See America: A Celebration of Our National Par...       3    5155.78
+44              Travel          Neither Here nor There: Travels in Europe       3    4109.23
+45              Travel                               Under the Tuscan Sun       3    3938.31
+46              Travel                            It's Only the Himalayas       2    4765.44
+47              Travel                                 A Summer In Europe       2    4677.87
+48              Travel  Vagabonding: An Uncommon Guide to the Art of L...       2    3897.17
+49              Travel                           The Great Railway Bazaar       1    3221.97
+------------------------------------------------------------------------------------------
+
+--- pd.read_sql Q1 (head) ---
+                                               title  price_inr
+0                            It's Only the Himalayas    4765.44
+1  Full Moon over Noah’s Ark: An Odyssey to Mount...    5214.86
+2  See America: A Celebration of Our National Par...    5155.78
+3  Vagabonding: An Uncommon Guide to the Art of L...    3897.17
+4                               Under the Tuscan Sun    3938.31
+
+--- pd.read_sql Q2 ---
+                                               title  price_inr
+0                      Boar Island (Anna Pigeon #19)    6275.14
+1                                            Candide    6185.46
+2  The No. 1 Ladies' Detective Agency (No. 1 Ladi...    6087.35
+3                                           El Deafo    6078.91
+4                                        Animal Farm    6036.71
+5   Ajin: Demi-Human, Volume 1 (Ajin: Demi-Human #1)    6019.83
+6                   A Year in Provence (Provence #1)    6000.84
+7               Giant Days, Vol. 1 (Giant Days #1-4)    5988.18
+8                                The Past Never Ends    5960.75
+9  The Sandman, Vol. 3: Dream Country (The Sandma...    5860.52
+
+--- Same JOIN result via pd.merge (no SQL) ---
+         category_name                                              title  rating  price_inr
+0             Classics                          The Story of Hong Gildong       4    4556.54
+1             Classics                     Little Women (Little Women #1)       4    2961.38
+2             Classics  The Complete Stories and Poems (The Works of E...       4    2825.29
+3             Classics                                  The Secret Garden       4    1590.94
+4             Classics                                            Candide       3    6185.46
+5             Classics                                        Animal Farm       3    6036.71
+6             Classics                                 Gone with the Wind       3    3427.70
+7             Classics                                  Wuthering Heights       3    1870.52
+8             Classics                             The Pilgrim's Progress       2    5302.43
+9             Classics                                    Of Mice and Men       2    4970.10
+10  Historical Fiction            A Flight of Arrows (The Pathfinders #2)       5    5858.42
+11  Historical Fiction                                While You Were Mine       5    4359.26
+12  Historical Fiction                                       The Red Tent       5    3762.13
+13  Historical Fiction                                       Mrs. Houdini       5    3191.38
+14  Historical Fiction                              The Passion of Dolssa       5    2987.76
+15  Historical Fiction                             Voyager (Outlander #3)       5    2222.89
+16  Historical Fiction                             Between Shades of Gray       5    2193.34
+17  Historical Fiction  A Spy's Devotion (The Regency Spies of London #1)       5    1790.33
+18  Historical Fiction                                  A Paris Apartment       4    4115.55
+19  Historical Fiction    World Without End (The Pillars of the Earth #2)       4    3478.34
+20             Mystery  The Bachelor Girl's Guide to Murder (Herringfo...       5    5517.65
+21             Mystery             A Time of Torment (Charlie Parker #14)       5    5100.92
+22             Mystery  What Happened on Beale Street (Secrets of the ...       5    2676.54
+23             Mystery                  The Silkworm (Cormoran Strike #2)       5    2431.78
+24             Mystery                                  The Girl You Lost       5    1296.59
+25             Mystery  The No. 1 Ladies' Detective Agency (No. 1 Ladi...       4    6087.35
+26             Mystery                                The Past Never Ends       4    5960.75
+27             Mystery  Murder at the 42nd Street Library (Raymond Amb...       4    5734.98
+28             Mystery                                      Sharp Objects       4    5045.01
+29             Mystery    The Murder of Roger Ackroyd (Hercule Poirot #4)       4    4652.55
+30      Sequential Art                                           El Deafo       5    6078.91
+31      Sequential Art  The Sandman, Vol. 3: Dream Country (The Sandma...       5    5860.52
+32      Sequential Art  Scott Pilgrim's Precious Little Life (Scott Pi...       5    5516.60
+33      Sequential Art  Rat Queens, Vol. 1: Sass & Sorcery (Rat Queens...       5    4954.28
+34      Sequential Art           Fruits Basket, Vol. 1 (Fruits Basket #1)       5    4249.54
+35      Sequential Art  Bleach, Vol. 1: Strawberry and the Soul Reaper...       5    3655.58
+36      Sequential Art      Saga, Volume 3 (Saga (Collected Editions) #3)       5    2275.64
+37      Sequential Art           Batman: The Dark Knight Returns (Batman)       5    1622.59
+38      Sequential Art                                        Roller Girl       5    1487.55
+39      Sequential Art  Princess Jellyfish 2-in-1 Omnibus, Vol. 01 (Pr...       5    1435.86
+40              Travel                 1,000 Places to See Before You Die       5    2751.44
+41              Travel                   A Year in Provence (Provence #1)       4    6000.84
+42              Travel  Full Moon over Noah’s Ark: An Odyssey to Mount...       4    5214.86
+43              Travel  See America: A Celebration of Our National Par...       3    5155.78
+44              Travel          Neither Here nor There: Travels in Europe       3    4109.23
+45              Travel                               Under the Tuscan Sun       3    3938.31
+46              Travel                            It's Only the Himalayas       2    4765.44
+47              Travel                                 A Summer In Europe       2    4677.87
+48              Travel  Vagabonding: An Uncommon Guide to the Art of L...       2    3897.17
+49              Travel                           The Great Railway Bazaar       1    3221.97
+
+SQL result matches pandas merge result: True.
+====================================================================================================
