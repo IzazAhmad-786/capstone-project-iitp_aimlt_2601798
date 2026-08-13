@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+langgraph
+chromadb
+sentence-transformers
+python-dotenv
+openai
