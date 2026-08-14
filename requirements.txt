@@ -1,0 +1,35 @@
+# Consolidated requirements for capstone-project-iitp_aimlt_2601798
+#
+# Installs everything needed to run all three modules in a single environment:
+#   pip install -r requirements.txt
+#
+# Each module also ships its own requirements (data_pipeline has no requirements.txt,
+# see its README; analytics/README.md; support_assistant/requirements.txt) if you'd
+# rather set up a smaller, per-module virtual environment instead — see the root
+# README for why that's the recommended path for grading/dev.
+
+# --- Module 1: data_pipeline ---
+requests
+beautifulsoup4
+
+# --- Module 2: analytics ---
+numpy
+seaborn
+matplotlib
+scikit-learn
+imbalanced-learn
+joblib
+jupyter
+nbformat
+
+# --- Module 3: support_assistant ---
+fastapi
+uvicorn[standard]
+langgraph
+chromadb
+sentence-transformers
+python-dotenv
+openai
+
+# --- shared (used by more than one module) ---
+pandas
