@@ -482,7 +482,6 @@ If you'd rather set up a single environment for the whole repo instead (e.g. to 
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
